@@ -1,6 +1,7 @@
 package com.example.tasktracker;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -49,7 +50,10 @@ public class TaskAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+
         Task task = taskList.get(position);
+
 
         if (task.isHeader()) {
             convertView = LayoutInflater.from(context).inflate(R.layout.header_item, parent, false);
@@ -76,20 +80,24 @@ public class TaskAdapter extends BaseAdapter {
 
                     if (isChecked) {
                         showWelldoneImage();
-                    }
-                }
-            });
+                        removeTaskById(task.getId());
+                        notifyDataSetChanged();
 
-            convertView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (listener != null) {
-                        listener.onTaskLongClick(task);
+                        ((MainActivity) context).refreshTaskList();
                     }
-                    return true;
                 }
             });
         }
+
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (listener != null && !task.isHeader()) {
+                    listener.onTaskLongClick(task);
+                }
+                return true;
+            }
+        });
 
         return convertView;
     }
@@ -108,5 +116,14 @@ public class TaskAdapter extends BaseAdapter {
 
     public interface OnTaskClickListener {
         void onTaskLongClick(Task task);
+    }
+
+    private void removeTaskById(int taskId) {
+        for (Task task : taskList) {
+            if (task.getId() == taskId) {
+                taskList.remove(task);
+                break;
+            }
+        }
     }
 }

@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private TaskAdapter taskAdapter;
     private Spinner sortSpinner;
     private EditText searchEditText;
+    private FloatingActionButton completedTasksButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
         dbHelper = new TaskDatabaseHelper(this);
         taskListView = findViewById(R.id.taskListView);
-        taskAdapter = new TaskAdapter(this, new ArrayList<>(), this, dbHelper);
+        taskAdapter = new TaskAdapter(this, dbHelper.getAllTasks(""), this, dbHelper);
         taskListView.setAdapter(taskAdapter);
 
         searchEditText = findViewById(R.id.searchEditText);
@@ -81,6 +82,14 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        completedTasksButton = findViewById(R.id.completedTasksButton);
+        completedTasksButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CompletedTasksActivity.class));
             }
         });
 
@@ -173,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
     private void deleteTask(Task task) {
         dbHelper.deleteTask(task.getId());
+        taskAdapter.updateTasks(dbHelper.getAllTasks(""));
+    }
+
+    public void refreshTaskList() {
         taskAdapter.updateTasks(dbHelper.getAllTasks(""));
     }
 }
