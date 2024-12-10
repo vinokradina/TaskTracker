@@ -3,8 +3,11 @@ package com.example.tasktracker;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private ListView taskListView;
     private TaskAdapter taskAdapter;
     private Spinner sortSpinner;
+    private EditText searchEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,27 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         taskListView = findViewById(R.id.taskListView);
         taskAdapter = new TaskAdapter(this, new ArrayList<>(), this, dbHelper);
         taskListView.setAdapter(taskAdapter);
+
+        searchEditText = findViewById(R.id.searchEditText);
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String keyword = s.toString().trim();
+                if (keyword.isEmpty()) {
+                    taskAdapter.updateTasks(dbHelper.getAllTasks(""));
+                } else {
+                    taskAdapter.updateTasks(dbHelper.searchTasks(keyword));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         sortSpinner = findViewById(R.id.sortSpinner);
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
