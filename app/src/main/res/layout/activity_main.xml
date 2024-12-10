@@ -4,6 +4,13 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Spinner
+        android:id="@+id/sortSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:entries="@array/sort_options" />
+
     <ListView
         android:id="@+id/taskListView"
         android:layout_width="match_parent"

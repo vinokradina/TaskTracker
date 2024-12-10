@@ -18,7 +18,7 @@ public class TaskAdapter extends BaseAdapter {
     private Context context;
     private List<Task> taskList;
     private OnTaskClickListener listener;
-    private TaskDatabaseHelper dbHelper; //
+    private TaskDatabaseHelper dbHelper;
 
     public TaskAdapter(Context context, List<Task> taskList, OnTaskClickListener listener, TaskDatabaseHelper dbHelper) {
         this.context = context;
@@ -49,45 +49,47 @@ public class TaskAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
-        }
-
         Task task = taskList.get(position);
 
-        TextView titleTextView = convertView.findViewById(R.id.titleTextView);
-        titleTextView.setText(task.getTitle());
+        if (task.isHeader()) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.header_item, parent, false);
+            TextView headerTextView = convertView.findViewById(R.id.headerTextView);
+            headerTextView.setText(task.getTitle());
+        } else {
+            convertView = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
 
-        TextView descriptionTextView = convertView.findViewById(R.id.descriptionTextView);
-        descriptionTextView.setText(task.getDescription());
+            TextView titleTextView = convertView.findViewById(R.id.titleTextView);
+            TextView descriptionTextView = convertView.findViewById(R.id.descriptionTextView);
+            TextView dueDateTextView = convertView.findViewById(R.id.dueDateTextView);
+            CheckBox completedCheckBox = convertView.findViewById(R.id.completedCheckBox);
 
-        TextView dueDateTextView = convertView.findViewById(R.id.dueDateTextView);
-        dueDateTextView.setText("Срок: " + task.getDueDate());
+            titleTextView.setText(task.getTitle());
+            descriptionTextView.setText(task.getDescription());
+            dueDateTextView.setText("Срок: " + task.getDueDate());
+            completedCheckBox.setChecked(task.isCompleted());
 
-        CheckBox completedCheckBox = convertView.findViewById(R.id.completedCheckBox);
-        completedCheckBox.setChecked(task.isCompleted());
+            completedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    task.setCompleted(isChecked);
+                    dbHelper.updateTask(task);
 
-        completedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                task.setCompleted(isChecked);
-                dbHelper.updateTask(task);
-
-                if (isChecked) {
-                    showWelldoneImage();
+                    if (isChecked) {
+                        showWelldoneImage();
+                    }
                 }
-            }
-        });
+            });
 
-        convertView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (listener != null) {
-                    listener.onTaskLongClick(task);
+            convertView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (listener != null) {
+                        listener.onTaskLongClick(task);
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        }
 
         return convertView;
     }

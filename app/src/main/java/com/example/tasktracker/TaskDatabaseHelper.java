@@ -58,10 +58,35 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<Task> getAllTasks() {
+    public List<Task> getAllTasks(String sortBy) {
         List<Task> taskList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+
+        String orderBy = "";
+        switch (sortBy) {
+            case "category":
+                orderBy = COLUMN_CATEGORY + " ASC";
+                break;
+            case "priority":
+                orderBy = COLUMN_PRIORITY + " ASC";
+                break;
+            case "due_date":
+                orderBy = COLUMN_DUE_DATE + " ASC";
+                break;
+            default:
+                orderBy = COLUMN_ID + " ASC"; // По умолчанию сортируем по ID
+        }
+
+        Cursor cursor = db.query(
+                TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                orderBy
+        );
+
         if (cursor.moveToFirst()) {
             do {
                 @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));

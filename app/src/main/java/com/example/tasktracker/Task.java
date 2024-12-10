@@ -8,6 +8,7 @@ public class Task {
     private String dueDate;
     private String priority;
     private String category;
+    private boolean isHeader;
 
     public Task(int id, String title, String description, boolean isCompleted, String dueDate, String priority, String category) {
         this.id = id;
@@ -17,6 +18,12 @@ public class Task {
         this.dueDate = dueDate;
         this.priority = priority;
         this.category = category;
+        this.isHeader = false;
+    }
+
+    public Task(String title) {
+        this.title = title;
+        this.isHeader = true;
     }
 
     public int getId() {
@@ -45,6 +52,10 @@ public class Task {
 
     public String getCategory() {
         return category;
+    }
+
+    public boolean isHeader() {
+        return isHeader;
     }
 
     public void setCompleted(boolean completed) {
